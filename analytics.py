@@ -1,100 +1,56 @@
 from statistics import mode
 from fileholder import read_csv_file
+import numpy as np
+from scipy.stats import kurtosis
+from scipy.stats import skew
 def calculate_statistics(data, choice):
     """
     Calculate various statistical functions based on user choice.
     
     Args:
-        data: List of numbers. But arrays bhi use kar sakte ho . 
+        data: List of numbers or numpy array.
         choice: Integer representing the statistical function
     """
+    data = np.array(data) #MADE BY PRANJAL SARASWAT AKA PanjoGojo
     match choice:
         case 1:
-            # Mean (Central Tendency) - Average of all values
-            # Logic: Sum all values and divide by count
-            return sum(data) / len(data)
-        
+            return np.mean(data)
         case 2:
-            # Median (Central Tendency) - Middle value when sorted
-            # Logic: Sort data, then find middle element(s)
-            # If odd length, return middle value; if even, return average of two middle values
-            sorted_data = sorted(data)
-            n = len(sorted_data)
-            return sorted_data[n // 2] if n % 2 == 1 else (sorted_data[n // 2 - 1] + sorted_data[n // 2]) / 2
-        
-       
+            return np.median(data)
         case 3:
             # Mode (Central Tendency) - Most frequently occurring value
             # Logic: Use statistics.mode() to find the value with highest frequency
             return mode(data)
         
         case 4:
-            # Standard Deviation (Deviation) - Measure of spread around mean
-            # Logic: Calculate variance, then take square root for standard deviation
-            mean = sum(data) / len(data)
-            variance = sum((x - mean) ** 2 for x in data) / len(data)
-            return variance ** 0.5
-        
+            return np.std(data)
         case 5:
-            # Variance (Deviation) - Average squared deviation from mean
-            # Logic: For each value, subtract mean and square it, then average all squared differences
-            mean = sum(data) / len(data)
-            return sum((x - mean) ** 2 for x in data) / len(data)
-        
+            return np.var(data)
         case 6:
-            # Range (Deviation) - Difference between max and min values
-            # Logic: Find maximum and minimum values, then compute their difference
-            return max(data) - min(data)
-        
+            return np.ptp(data)
         case 7:
-            # Kurtosis (Shape) - Measure of tail heaviness in distribution
-            # Logic: Calculate fourth moment, divide by variance squared, subtract 3 for excess kurtosis
-            mean = sum(data) / len(data)
-            variance = sum((x - mean) ** 2 for x in data) / len(data)
-            fourth_moment = sum((x - mean) ** 4 for x in data) / len(data)
-            return (fourth_moment / (variance ** 2)) - 3
-        
+            return kurtosis(data) 
+        #Ye bataata hai ki data ke tails kitne heavy ya light hain. Matlab
+          #extreme values kitni baar aati hain
+          #Agar tail zyada heavy → outliers zyada, peak sharp → leptokurtic, flat → platykurtic
         case 8:
-            # Skewness (Shape) - Measure of asymmetry in distribution
-            # Logic: Calculate third moment divided by variance^1.5
-            # Positive skewness: tail on right, mean > median (right-skewed)
-            # Negative skewness: tail on left, mean < median (left-skewed)
-            # Zero skewness: symmetric distribution
-            mean = sum(data) / len(data)
-            variance = sum((x - mean) ** 2 for x in data) / len(data)
-            third_moment = sum((x - mean) ** 3 for x in data) / len(data)
-            skewness = third_moment / (variance ** 1.5)
-            
+            skewness = skew(data) #“Ye bataata hai ki data ka distribution left ya right ki taraf tilt hua hai
             if skewness > 0:
-                return f"Positive Skewness: {skewness:.4f} (right-skewed)"
+                return f"Positive Skewness: {skewness:.4f} (right-skewed)"#positive skew → tail right, negative skew → tail left.
             elif skewness < 0:
                 return f"Negative Skewness: {skewness:.4f} (left-skewed)"
             else:
                 return f"Symmetric: {skewness:.4f} (no skew)"
             
         case 9:
-            # Quartiles and Interquartile Range (IQR) - Measure of data distribution
-            # Logic: Sort data, then calculate Q1 (25th percentile), Q2 (median), Q3 (75th percentile)
-            # IQR = Q3 - Q1, represents the middle 50% of data
-            sorted_data = sorted(data)
-            n = len(sorted_data)
-            q1 = sorted_data[n // 4] if n % 4 != 0 else (sorted_data[n // 4 - 1] + sorted_data[n // 4]) / 2
-            q2 = sorted_data[n // 2] if n % 2 == 1 else (sorted_data[n // 2 - 1] + sorted_data[n // 2]) / 2
-            q3 = sorted_data[3 * n // 4] if n % 4 != 0 else (sorted_data[3 * n // 4 - 1] + sorted_data[3 * n // 4]) / 2
-            iqr = q3 - q1
-            return {"Q1": q1, "Q2 (Median)": q2, "Q3": q3, "IQR": iqr}
-            # Median (Central Tendency) - Middle value when sorted
-            # Logic: Sort data, then find middle element(s)
-            # If odd length, return middle value; if even, return average of two middle values
-            sorted_data = sorted(data)
-            n = len(sorted_data)
-            return sorted_data[n // 2] if n % 2 == 1 else (sorted_data[n // 2 - 1] + sorted_data[n // 2]) / 2
+            q1, q2, q3 = np.percentile(data, [25, 50, 75])
+            return {"Q1": q1, "Q2 (Median)": q2, "Q3": q3, "IQR": q3 - q1} #PanjoGojo
             
-        
         case _:
             # Default case for invalid input
             # Logic: Return error message if choice doesn't match any case
             return "Invalid choice"
+   
 # Example usage
 if __name__ == "__main__":
     # Read data from CSV file (update filepath as needed)

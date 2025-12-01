@@ -1,0 +1,13 @@
+Requirements
+
+Python 3.10+
+
+NumPy
+
+SciPy
+
+Matplotlib
+
+Seaborn
+
+Pandas
